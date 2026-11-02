@@ -1,0 +1,3 @@
+[submodule "window/MiniFB"]
+	path = window/MiniFB
+	url = git@github.com:emoon/minifb.git

@@ -1,33 +1,27 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.12...3.26)
 
-project(terminal-renderer LANGUAGES C)
+project(tinyrenderer LANGUAGES CXX)
 
-add_executable(terminal-renderer
-  src/core/grid.c
-  src/main.c
-  src/renderer/renderer.c
-  src/renderer/lighting.c
-  src/renderer/framebuffer.c
-  src/renderer/rasterizer/rasterizer.c
-  src/renderer/rasterizer/shapes.c
-  src/renderer/raymarcher/raymarcher.c
-  src/renderer/raymarcher/sdf.c
-  src/terminal/tui.c
-  src/terminal/ui.c
-)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
 
-target_include_directories(terminal-renderer PRIVATE src)
-
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(terminal-renderer PRIVATE -Wall -Wextra -Wpedantic)
+option(iwyu "Run include-what-you-use")
+if(iwyu)
+  find_program(IWYU_EXE NAMES include-what-you-use REQUIRED)
+  set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${IWYU_EXE})
 endif()
 
-target_compile_definitions(terminal-renderer PRIVATE _POSIX_C_SOURCE=200809L)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|Intel")
+  add_compile_options(-Wall)
+endif()
 
-target_link_libraries(terminal-renderer PRIVATE m)
+find_package(OpenMP COMPONENTS CXX)
+add_subdirectory(MiniFB)
 
-set_target_properties(
-  terminal-renderer
-  PROPERTIES C_STANDARD 99
-              C_STANDARD_REQUIRED YES
-              C_EXTENSIONS NO)
+set(SOURCES main.cpp)
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(
+  ${PROJECT_NAME} PRIVATE $<$<BOOL:${OpenMP_CXX_FOUND}>:OpenMP::OpenMP_CXX>
+                          minifb)
+target_include_directories(${PROJECT_NAME} PRIVATE MiniFB/include)

@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/bash 
 
-cmake -S . -B build && cmake --build build && ./build/terminal-renderer
+cmake -S . -B build && cmake --build build && ./build/tinyrenderer
