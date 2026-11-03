@@ -18,7 +18,7 @@ endif()
 find_package(OpenMP COMPONENTS CXX)
 add_subdirectory(MiniFB)
 
-set(SOURCES main.cpp)
+set(SOURCES src/main.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(
