@@ -1,19 +1,20 @@
-#pragma once
+#include "rasterize.hpp"
 
-#include "hunter_math.hpp"
 #include "screen.hpp"
 
 // Barycentric formula
-void rasterize(Triangle triangle, vec3<float> move, uint32_t color) {
-  auto a = screen(triangle.a, move);
-  auto b = screen(triangle.b, move);
-  auto c = screen(triangle.c, move);
+void rasterize(std::tuple<glm::vec3, glm::vec3, glm::vec3> triangle,
+               uint32_t color) {
 
-  vec2<float> u = {b.x - a.x, b.y - a.y};
-  vec2<float> v = {c.x - a.x, c.y - a.y};
+  auto a = screen(std::get<0>(triangle));
+  auto b = screen(std::get<1>(triangle));
+  auto c = screen(std::get<2>(triangle));
+
+  glm::vec2 u = {b.x - a.x, b.y - a.y};
+  glm::vec2 v = {c.x - a.x, c.y - a.y};
 
   float det = u.x * v.y - u.y * v.x;
-  if (det <= 0.0f)
+  if (det >= 0.0f)
     return;
 
   // bounding boxes so we aren't looping over all pixels
@@ -23,24 +24,19 @@ void rasterize(Triangle triangle, vec3<float> move, uint32_t color) {
   int min_y = std::max(0, int(std::min({a.y, b.y, c.y})));
   int max_y = std::min(int(height) - 1, int(std::max({a.y, b.y, c.y})));
 
-  float inv_a = 1.0f / a.z;
-  float inv_b = 1.0f / b.z;
-  float inv_c = 1.0f / c.z;
-
-  // #pragma omp parallel for
   for (int y = min_y; y <= max_y; y++) {
     for (int x = min_x; x <= max_x; x++) {
-      // t and s tell us how far along each vector we are
-      vec3<float> q = {x - a.x, y - a.y};
+      glm::vec3 q = {x - a.x, y - a.y};
 
+      // t and s tell us how far along each vector we are
       float t = (u.x * q.y - u.y * q.x) / det;
       float s = (q.x * v.y - q.y * v.x) / det;
 
       if (s + t <= 1 && s >= 0 && t >= 0) {
-        float inv_z = (1.0f - s - t) * inv_a + s * inv_b + t * inv_c;
+        float z = (1.0f - s - t) * a.z + s * b.z + t * c.z;
 
-        if (inv_z > zbuffer[y * width + x]) {
-          zbuffer[y * width + x] = inv_z;
+        if (z < zbuffer[y * width + x]) {
+          zbuffer[y * width + x] = z;
           buffer[y * width + x] = color;
         }
       }

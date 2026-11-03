@@ -17,12 +17,12 @@ struct Color {
   Color operator/(float s) const {
     return {uint8_t(r / s), uint8_t(g / s), uint8_t(b / s)};
   }
-};
 
-// packing colors to fit inside uint32_t buffer ARGB
-constexpr uint32_t pack_color(Color color, uint8_t a = 255) {
-  return (a << 24) | (color.r << 16) | (color.g << 8) | color.b;
-}
+  // packing colors to fit inside uint32_t buffer ARGB
+  uint32_t pack_color(uint8_t a = 255) {
+    return (a << 24) | (r << 16) | (g << 8) | b;
+  }
+};
 
 // RGBA ordering
 constexpr Color WHITE = {255, 255, 255};

@@ -1,15 +1,15 @@
-#pragma once
+#include "wireframe.hpp"
 
 #include "color.hpp"
-#include "hunter_math.hpp"
 #include "screen.hpp"
+#include <cmath>
 
-void line(vec3<float> start, vec3<float> end) {
+void line(glm::vec3 start, glm::vec3 end) {
 
   bool steep = std::abs(start.x - end.x) < std::abs(start.y - end.y);
   if (steep) {
-    start = {start.y, start.x};
-    end = {end.y, end.x};
+    std::swap(start.y, start.x);
+    std::swap(end.y, end.x);
   }
 
   if (start.x > end.x) {
@@ -28,7 +28,7 @@ void line(vec3<float> start, vec3<float> end) {
   }
 }
 
-void triangle(vec3<float> a, vec3<float> b, vec3<float> c) {
+void wireframe(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
   line(a, b);
   line(b, c);
   line(c, a);

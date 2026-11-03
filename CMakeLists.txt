@@ -24,4 +24,5 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE $<$<BOOL:${OpenMP_CXX_FOUND}>:OpenMP::OpenMP_CXX>
                           minifb)
-target_include_directories(${PROJECT_NAME} PRIVATE MiniFB/include)
+target_include_directories(${PROJECT_NAME} PRIVATE MiniFB/include src/
+                                                   src/pipeline)
