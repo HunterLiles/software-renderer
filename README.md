@@ -14,3 +14,4 @@ Does not have:
   - Camera movement
 - fog
 - parallax mapping
+- dithering
