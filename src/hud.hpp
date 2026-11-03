@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+#include <cstdio>
 #include <string_view>
 
 #include "color.hpp"
@@ -53,6 +55,51 @@ constexpr uint8_t font[][7] = {
 
 static_assert(sizeof(font) / sizeof(font[0]) == characters.size());
 
+using Clock = std::chrono::steady_clock;
+
+struct Stats {
+  Clock::time_point previous, now;
+
+  float total_time{};
+  float elapsed{};
+  float dt{};
+
+  int frames{};
+  char stats[64]{};
+} stats;
+
+void init_time() {
+  // logging stats
+  stats.now = Clock::now();
+  stats.previous = stats.now;
+}
+
+void update_time() {
+  // update logging
+  stats.now = Clock::now();
+  stats.dt = std::chrono::duration<float>(stats.now - stats.previous).count();
+  stats.previous = stats.now;
+
+  stats.total_time += stats.dt;
+  stats.elapsed += stats.dt;
+}
+
+void FPS() {
+  // FPS and Frametime
+  stats.frames++;
+
+  if (stats.elapsed >= 0.25f) {
+    float fps = stats.frames / stats.elapsed;
+    float frame_ms = 1000.0f * stats.elapsed / stats.frames;
+
+    std::snprintf(stats.stats, sizeof(stats.stats),
+                  "FPS: %.1f\nFRAMETIME: %.4f MS", fps, frame_ms);
+
+    stats.elapsed = 0.0f;
+    stats.frames = 0;
+  }
+}
+
 void draw_text(int x, int y, std::string_view text, uint32_t color,
                int scale = 1) {
   if (scale <= 0)
@@ -92,7 +139,7 @@ void draw_text(int x, int y, std::string_view text, uint32_t color,
   }
 }
 
-void hud(std::string_view text, float opacity = 0.6f) {
+void hud(float opacity = 0.6f) {
   float visibility = 1.0f - std::clamp(opacity, 0.0f, 1.0f);
 
   // define the box to draw the hud
@@ -116,5 +163,5 @@ void hud(std::string_view text, float opacity = 0.6f) {
   }
 
   draw_text(min_x + 8, min_y + 8, "STATS", pack_color(WHITE), 2);
-  draw_text(min_x + 8, min_y + 28, text, pack_color(WHITE), 2);
+  draw_text(min_x + 8, min_y + 28, stats.stats, pack_color(WHITE), 2);
 }
