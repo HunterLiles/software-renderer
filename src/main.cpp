@@ -12,7 +12,7 @@
 int main(int argc, char **argv) {
 
   struct mfb_window *window =
-      mfb_open_ex("Software Renderer", WIDTH, HEIGHT, MFB_WF_RESIZABLE);
+      mfb_open_ex("Software Renderer", width, height, MFB_WF_RESIZABLE);
   if (window == nullptr)
     return 0;
 
@@ -41,8 +41,26 @@ int main(int argc, char **argv) {
 
   vec3<float> move = {0.0f, 0.0f, 1.25f};
   do {
-    std::fill(buffer, buffer + WIDTH * HEIGHT, 0u);
-    std::fill(zbuffer, zbuffer + WIDTH * HEIGHT, 0u);
+    auto new_width = mfb_get_window_width(window);
+    auto new_height = mfb_get_window_height(window);
+
+    if (new_width == 0 || new_height == 0)
+      continue;
+
+    if (new_width != width || new_height != height) {
+      delete[] buffer;
+      delete[] zbuffer;
+
+      width = new_width;
+      height = new_height;
+      ratio = float(width) / float(height);
+
+      buffer = new uint32_t[width * height];
+      zbuffer = new float[width * height];
+    }
+
+    std::fill(buffer, buffer + width * height, 0u);
+    std::fill(zbuffer, zbuffer + width * height, 0u);
 
     auto now = Clock::now();
     float dt = std::chrono::duration<float>(now - previous).count();
@@ -67,7 +85,7 @@ int main(int argc, char **argv) {
     hud(stats, 0.6f);
 
     // update buffer
-    state = mfb_update_ex(window, buffer, WIDTH, HEIGHT);
+    state = mfb_update_ex(window, buffer, width, height);
     if (state != MFB_STATE_OK)
       break;
 
@@ -89,7 +107,7 @@ int main(int argc, char **argv) {
 
   // Free everything
   delete[] buffer;
-  buffer = nullptr;
+  delete[] zbuffer;
   window = nullptr;
   return 0;
 }

@@ -22,9 +22,9 @@ void line(vec3<float> start, vec3<float> end) {
                        (x - start.x) * ((end.y - start.y) / (end.x - start.x)));
 
     if (steep)
-      buffer[x * WIDTH + y] = pack_color(GREEN);
+      buffer[x * width + y] = pack_color(GREEN);
     else
-      buffer[y * WIDTH + x] = pack_color(GREEN);
+      buffer[y * width + x] = pack_color(GREEN);
   }
 }
 

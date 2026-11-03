@@ -14,9 +14,16 @@ template <typename T> struct vec2 {
 template <typename T> struct vec3 {
   T x, y, z;
 
+  vec3<T> operator-(vec3<T> b) { return vec3<T>(x - b.x, y - b.y, z - b.z); }
   vec3<T> operator-(float b) { return vec3<T>(x - b, y - b, z - b); }
+
+  vec3<T> operator+(vec3<T> b) { return vec3<T>(x + b.x, y + b.y, z + b.z); }
   vec3<T> operator+(float b) { return vec3<T>(x + b, y + b, z + b); }
+
+  vec3<T> operator*(vec3<T> b) { return vec3<T>(x * b.x, y * b.y, z * b.z); }
   vec3<T> operator*(float b) { return vec3<T>(x * b, y * b, z * b); }
+
+  vec3<T> operator/(vec3<T> b) { return vec3<T>(x / b.x, y / b.y, z / b.z); }
   vec3<T> operator/(float b) { return vec3<T>(x / b, y / b, z / b); }
 };
 
@@ -37,9 +44,13 @@ vec3<float> screen(vec3<float> p, vec3<float> move) {
   p.y += move.y;
   p.z += move.z;
 
+  // perspective
+  constexpr double camera_pos = 3.0;
+  p = p / (1 - p.z / camera_pos);
+
   // Projecting p into 2d space
-  float x = p.x / (p.z * RATIO); // keep aspect correct
+  float x = p.x / (p.z * ratio); // keep aspect correct
   float y = -p.y / p.z;
 
-  return {(x + 1.0f) * WIDTH / 2.0f, (y + 1.0f) * HEIGHT / 2.0f, p.z};
+  return {(x + 1.0f) * width / 2.0f, (y + 1.0f) * height / 2.0f, p.z};
 }

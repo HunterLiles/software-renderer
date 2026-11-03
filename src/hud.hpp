@@ -80,8 +80,8 @@ void draw_text(int x, int y, std::string_view text, uint32_t color,
               int px = x + col * scale + dx;
               int py = y + row * scale + dy;
 
-              if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT)
-                buffer[py * WIDTH + px] = color;
+              if (px >= 0 && px < int(width) && py >= 0 && py < int(height))
+                buffer[py * width + px] = color;
             }
           }
         }
@@ -105,7 +105,7 @@ void hud(std::string_view text, float opacity = 0.6f) {
   // make a dark box that is see through
   for (int x = min_x; x <= max_x; x++) {
     for (int y = min_y; y <= max_y; y++) {
-      uint32_t &pixel = buffer[y * WIDTH + x];
+      uint32_t &pixel = buffer[y * width + x];
 
       Color darkened = {uint8_t(((pixel >> 16) & 0xffu) * visibility),
                         uint8_t(((pixel >> 8) & 0xffu) * visibility),
